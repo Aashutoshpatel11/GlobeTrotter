@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function ChallengeCard() {
+  const [joined, setJoined] = useState(false);
+
   return (
     <div className="bg-[#ff794d] rounded-3xl p-6 md:p-8 flex flex-col mb-6 shadow-sm text-white">
       {/* Icon + Title */}
@@ -19,10 +21,16 @@ export default function ChallengeCard() {
         Join this month's challenge and win a featured spot on the homepage.
       </p>
 
-      <button className="bg-[#5a1c06] text-white font-bold py-3 px-6 rounded-full w-max hover:bg-[#421303] transition-colors text-sm">
-        Join Challenge
+      <button 
+        onClick={() => setJoined(!joined)}
+        className={`font-bold py-3 px-6 rounded-full w-max transition-all text-sm shadow-sm ${
+          joined 
+            ? 'bg-white text-[#5a1c06] scale-105' 
+            : 'bg-[#5a1c06] text-white hover:bg-[#421303]'
+        }`}
+      >
+        {joined ? 'Joined Challenge! 🏆' : 'Join Challenge'}
       </button>
     </div>
   );
 }
-

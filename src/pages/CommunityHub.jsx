@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { getCommunityPosts } from '../services/community.api.js';
-
+import React, { useState, useMemo } from 'react';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import CommunityCard from '../components/community/CommunityCard';
@@ -8,12 +6,13 @@ import ChallengeCard from '../components/community/ChallengeCard';
 
 export default function CommunityHub() {
   const [activeFilter, setActiveFilter] = useState('All Trips');
-  const filters = ['All Trips', 'Backpacking', 'Luxury', 'Foodie'];
+  const [searchQuery, setSearchQuery] = useState('');
+  const filters = ['All Trips', 'Foodie', 'Nature', 'Culture', 'Roadtrip', 'Backpacking'];
 
-  const posts = [
+  const initialPosts = [
     {
       id: 1,
-      image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=600', // Japan fallback
+      image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=600',
       tags: ['Japan', 'Foodie'],
       title: '10 Days Culinary Journey through Kansai',
       authorName: 'Sarah Chen',
@@ -23,8 +22,8 @@ export default function CommunityHub() {
     },
     {
       id: 2,
-      image: 'https://images.unsplash.com/photo-1513519107127-1bed33748e4c?auto=format&fit=crop&q=80&w=600', // Fjord fallback
-      tags: ['Norway', 'Nature'],
+      image: 'https://images.unsplash.com/photo-1513519107127-1bed33748e4c?auto=format&fit=crop&q=80&w=600',
+      tags: ['Norway', 'Nature', 'Backpacking'],
       title: 'Fjord Hiking Adventure & Wild Camping',
       authorName: 'Lars Petersen',
       authorAvatar: 'https://i.pravatar.cc/150?img=11',
@@ -33,7 +32,7 @@ export default function CommunityHub() {
     },
     {
       id: 3,
-      image: 'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?auto=format&fit=crop&q=80&w=600', // Morocco fallback
+      image: 'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?auto=format&fit=crop&q=80&w=600',
       tags: ['Morocco', 'Culture', 'Solo'],
       title: 'Lost in the Medinas: A Solo Guide',
       authorName: 'Elena Rivera',
@@ -43,15 +42,43 @@ export default function CommunityHub() {
     },
     {
       id: 4,
-      image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&q=80&w=600', // Highway fallback
+      image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&q=80&w=600',
       tags: ['USA', 'Roadtrip'],
       title: 'Pacific Coast Highway: The Ultimate Itinerary',
       authorName: 'The Nomads',
       authorAvatar: 'https://i.pravatar.cc/150?img=12',
       likes: '4.5k',
       isLiked: false
+    },
+    {
+      id: 5,
+      image: 'https://images.unsplash.com/photo-1533682805518-48d1f5b8cb3a?auto=format&fit=crop&q=80&w=600',
+      tags: ['Italy', 'Foodie', 'Nature'],
+      title: 'Coastal Escapes & Hidden Lemon Groves',
+      authorName: 'Marco Rossi',
+      authorAvatar: 'https://i.pravatar.cc/150?img=33',
+      likes: '3.1k',
+      isLiked: false
     }
   ];
+
+  const filteredPosts = useMemo(() => {
+    return initialPosts.filter(post => {
+      // Filter by tag
+      if (activeFilter !== 'All Trips' && !post.tags.includes(activeFilter)) {
+        return false;
+      }
+      // Filter by search
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchesTitle = post.title.toLowerCase().includes(q);
+        const matchesAuthor = post.authorName.toLowerCase().includes(q);
+        const matchesTags = post.tags.some(t => t.toLowerCase().includes(q));
+        if (!matchesTitle && !matchesAuthor && !matchesTags) return false;
+      }
+      return true;
+    });
+  }, [activeFilter, searchQuery]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fdfbf7]">
@@ -67,16 +94,21 @@ export default function CommunityHub() {
         </div>
 
         {/* Search & Filters */}
-        <div className="bg-[#f4f3ec] rounded-2xl p-3 flex flex-col lg:flex-row items-center justify-between gap-4 mb-10">
+        <div className="bg-[#f4f3ec] rounded-2xl p-3 flex flex-col lg:flex-row items-center justify-between gap-4 mb-10 border border-gray-200/60 shadow-inner">
           <div className="relative w-full lg:max-w-md">
             <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input 
               type="text" 
-              placeholder="Search destinations, tags..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search destinations, tags (e.g. Japan, Roadtrip)..." 
               className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[var(--primary)] bg-white placeholder-gray-400"
             />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold hover:text-gray-600">✕</button>
+            )}
           </div>
 
           <div className="flex items-center gap-2 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 hide-scrollbar">
@@ -86,49 +118,42 @@ export default function CommunityHub() {
                 onClick={() => setActiveFilter(filter)}
                 className={`px-5 py-2 rounded-full text-[13px] font-bold whitespace-nowrap transition-all ${
                   activeFilter === filter 
-                    ? 'bg-[var(--primary)] text-white border-transparent' 
+                    ? 'bg-[var(--primary)] text-white shadow-sm' 
                     : 'bg-white text-[var(--text-main)] border border-gray-200 hover:border-gray-300'
                 }`}
               >
                 {filter}
               </button>
             ))}
-            <button className="px-4 py-2 rounded-full text-[13px] font-bold whitespace-nowrap bg-white text-[var(--text-main)] border border-gray-200 hover:border-gray-300 flex items-center gap-1.5 ml-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-              </svg>
-              Filters
+          </div>
+        </div>
+
+        {/* Masonry / Grid */}
+        {filteredPosts.length === 0 ? (
+          <div className="bg-white rounded-3xl p-12 text-center border border-gray-100 max-w-lg mx-auto">
+            <p className="text-lg font-bold text-gray-700 mb-2">No community stories found</p>
+            <p className="text-sm text-gray-500 mb-4">Try selecting another filter or clearing your search.</p>
+            <button onClick={() => { setActiveFilter('All Trips'); setSearchQuery(''); }} className="text-[var(--primary)] font-bold text-sm underline">
+              Reset Filters
             </button>
           </div>
-        </div>
+        ) : (
+          <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+            {/* Always insert challenge card in feed */}
+            <div className="break-inside-avoid">
+              <ChallengeCard />
+            </div>
 
-        {/* Masonry Grid */}
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-          {/* Column 1 Item */}
-          <div className="break-inside-avoid">
-            <CommunityCard {...posts[0]} />
+            {filteredPosts.map((post) => (
+              <div key={post.id} className="break-inside-avoid">
+                <CommunityCard {...post} />
+              </div>
+            ))}
           </div>
-
-          {/* Column 2 Items */}
-          <div className="break-inside-avoid">
-            <CommunityCard {...posts[1]} />
-          </div>
-          <div className="break-inside-avoid">
-            <CommunityCard {...posts[2]} />
-          </div>
-
-          {/* Column 3 Items */}
-          <div className="break-inside-avoid">
-            <ChallengeCard />
-          </div>
-          <div className="break-inside-avoid">
-            <CommunityCard {...posts[3]} />
-          </div>
-        </div>
+        )}
       </main>
 
       <Footer />
     </div>
   );
 }
-

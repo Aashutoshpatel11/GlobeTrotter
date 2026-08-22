@@ -18,11 +18,14 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/community" element={<CommunityHub />} />
         <Route path="/trips" element={<TripDetails />} />
+        <Route path="/trips/:id" element={<TripDetails />} />
         <Route path="/calendar" element={<CalendarView />} />
         <Route path="/create-trip" element={<CreateTrip />} />
         <Route path="/budget" element={<BudgetBreakdown />} />
         <Route path="/explore" element={<ExploreActivities />} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        {/* Wildcard 404 fallback */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   );
