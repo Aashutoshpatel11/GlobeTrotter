@@ -8,7 +8,7 @@ let sequelize;
 if (process.env.DATABASE_URL) {
     sequelize = new Sequelize(process.env.DATABASE_URL, {
         dialect: 'postgres',
-        logging: process.env.NODE_ENV === 'development' ? false : false,
+        logging: process.env.NODE_ENV === 'development' ? console.log : false,
         dialectOptions: process.env.DB_SSL === 'true' ? {
             ssl: {
                 require: true,
@@ -25,7 +25,7 @@ if (process.env.DATABASE_URL) {
             host: process.env.DB_HOST || 'localhost',
             port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 5432,
             dialect: 'postgres',
-            logging: false,
+            logging: process.env.NODE_ENV === 'development' ? console.log : false,
         }
     );
 }
