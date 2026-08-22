@@ -1,10 +1,8 @@
 import React from 'react';
 
-export default function MonthCalendar() {
+export default function MonthCalendar({ selectedDate = 13, onSelectDate = () => {} }) {
   const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
-  // Mock days array matching the screenshot exactly
-  // { date, isCurrentMonth, city, alert, items }
   const days = [
     { date: 29, isCurrentMonth: false },
     { date: 30, isCurrentMonth: false },
@@ -20,23 +18,23 @@ export default function MonthCalendar() {
     { date: 9, isCurrentMonth: true },
     { date: 10, isCurrentMonth: true },
     { date: 11, isCurrentMonth: true },
-    { date: 12, isCurrentMonth: true, city: 'tokyo', items: 1 },
+    { date: 12, isCurrentMonth: true, city: 'tokyo', items: 2 },
     
-    { date: 13, isCurrentMonth: true, city: 'tokyo', items: 3, alert: true, isActive: true },
+    { date: 13, isCurrentMonth: true, city: 'tokyo', items: 3, alert: true },
     { date: 14, isCurrentMonth: true, city: 'tokyo', items: 2 },
     { date: 15, isCurrentMonth: true, city: 'tokyo', items: 4 },
-    { date: 16, isCurrentMonth: true, city: 'tokyo' },
-    { date: 17, isCurrentMonth: true, city: 'kyoto' },
-    { date: 18, isCurrentMonth: true, city: 'kyoto', items: 2 },
-    { date: 19, isCurrentMonth: true, city: 'kyoto' },
+    { date: 16, isCurrentMonth: true, city: 'tokyo', items: 1 },
+    { date: 17, isCurrentMonth: true, city: 'kyoto', items: 2 },
+    { date: 18, isCurrentMonth: true, city: 'kyoto', items: 3 },
+    { date: 19, isCurrentMonth: true, city: 'kyoto', items: 2 },
     
-    { date: 20, isCurrentMonth: true, city: 'kyoto' },
-    { date: 21, isCurrentMonth: true, city: 'kyoto' },
-    { date: 22, isCurrentMonth: true, city: 'osaka' },
-    { date: 23, isCurrentMonth: true, city: 'osaka', items: 1 },
-    { date: 24, isCurrentMonth: true, city: 'osaka' },
+    { date: 20, isCurrentMonth: true, city: 'kyoto', items: 1 },
+    { date: 21, isCurrentMonth: true, city: 'osaka', items: 2 },
+    { date: 22, isCurrentMonth: true, city: 'osaka', items: 2 },
+    { date: 23, isCurrentMonth: true, city: 'osaka', items: 3 },
+    { date: 24, isCurrentMonth: true, city: 'osaka', items: 1 },
     { date: 25, isCurrentMonth: true, city: 'osaka', items: 3 },
-    { date: 26, isCurrentMonth: true, city: 'osaka' },
+    { date: 26, isCurrentMonth: true },
     
     { date: 27, isCurrentMonth: true },
     { date: 28, isCurrentMonth: true },
@@ -62,38 +60,38 @@ export default function MonthCalendar() {
       styles = "bg-[#eef5ef] text-[#2c7a40] border-[#cbe1d0]";
     }
 
-    if (day.isActive) {
-      styles += " shadow-[0_0_0_2px_#bc3e12] z-10"; // Highlight active day in rust
+    if (day.isCurrentMonth && day.date === selectedDate) {
+      styles += " ring-2 ring-[var(--primary)] shadow-md z-10 scale-[1.02]";
     }
     
     if (day.alert) {
-       styles = styles.replace('text-[#246399]', 'text-[#d63b2f]'); // make date text red
+       styles = styles.replace('text-[#246399]', 'text-[#d63b2f]');
     }
 
     return styles;
   };
 
   const getBadgeStyle = (city) => {
-    if (city === 'tokyo') return "text-[#246399] bg-white";
-    if (city === 'kyoto') return "text-[#b34033] bg-white";
-    if (city === 'osaka') return "text-[#2c7a40] bg-white";
+    if (city === 'tokyo') return "text-[#246399] bg-white/90 shadow-sm";
+    if (city === 'kyoto') return "text-[#b34033] bg-white/90 shadow-sm";
+    if (city === 'osaka') return "text-[#2c7a40] bg-white/90 shadow-sm";
     return "text-gray-500 bg-gray-100";
   };
 
   return (
     <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 w-full">
       {/* Legend */}
-      <div className="flex items-center gap-4 mb-6 text-sm font-bold text-[var(--text-main)]">
+      <div className="flex flex-wrap items-center gap-4 mb-6 text-sm font-bold text-[var(--text-main)]">
         <span>Stops:</span>
-        <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#246399]"></span> Tokyo</div>
-        <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#b34033]"></span> Kyoto</div>
-        <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#2c7a40]"></span> Osaka</div>
+        <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#246399]"></span> Tokyo (Oct 12-16)</div>
+        <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#b34033]"></span> Kyoto (Oct 17-20)</div>
+        <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#2c7a40]"></span> Osaka (Oct 21-25)</div>
       </div>
 
       {/* Days Header */}
       <div className="grid grid-cols-7 gap-2 md:gap-3 mb-3">
         {daysOfWeek.map(day => (
-          <div key={day} className="text-center text-[10px] md:text-xs font-bold text-gray-500 tracking-wider">
+          <div key={day} className="text-center text-[10px] md:text-xs font-bold text-gray-400 tracking-wider">
             {day}
           </div>
         ))}
@@ -104,7 +102,8 @@ export default function MonthCalendar() {
         {days.map((day, idx) => (
           <div 
             key={idx} 
-            className={`relative rounded-xl md:rounded-2xl h-16 md:h-24 p-2 md:p-3 flex flex-col justify-between transition-colors cursor-pointer ${getDayStyles(day)}`}
+            onClick={() => day.isCurrentMonth && onSelectDate(day.date, day.city)}
+            className={`relative rounded-xl md:rounded-2xl h-16 md:h-24 p-2 md:p-3 flex flex-col justify-between transition-all duration-200 cursor-pointer ${getDayStyles(day)}`}
           >
             <span className="font-bold text-sm md:text-base">{day.date}</span>
             
@@ -115,7 +114,7 @@ export default function MonthCalendar() {
             )}
 
             {day.alert && (
-              <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#d63b2f] text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-white shadow-sm z-20">
+              <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#d63b2f] text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-white shadow-sm z-20 animate-pulse">
                 !
               </div>
             )}
@@ -125,4 +124,3 @@ export default function MonthCalendar() {
     </div>
   );
 }
-

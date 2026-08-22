@@ -1,6 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-export default function CommunityCard({ image, tags = [], title, authorName, authorAvatar, likes, isLiked = false }) {
+export default function CommunityCard({ 
+  image, 
+  tags = [], 
+  title, 
+  authorName, 
+  authorAvatar, 
+  likes = '1.2k', 
+  isLiked = false 
+}) {
+  const [liked, setLiked] = useState(isLiked);
+  const [likeCount, setLikeCount] = useState(likes);
+
+  const handleLike = (e) => {
+    e.stopPropagation();
+    if (!liked) {
+      setLiked(true);
+      // parse or bump like count
+      if (typeof likeCount === 'string' && likeCount.endsWith('k')) {
+        setLikeCount((parseFloat(likeCount) + 0.1).toFixed(1) + 'k');
+      } else if (!isNaN(Number(likeCount))) {
+        setLikeCount(Number(likeCount) + 1);
+      }
+    } else {
+      setLiked(false);
+      setLikeCount(likes);
+    }
+  };
+
   return (
     <div className="bg-white rounded-3xl overflow-hidden shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col mb-6 cursor-pointer hover:shadow-md transition-shadow group">
       {/* Image Container */}
@@ -8,8 +35,12 @@ export default function CommunityCard({ image, tags = [], title, authorName, aut
         <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         
         {/* Heart Icon (Like) */}
-        <button className="absolute top-4 right-4 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-[var(--primary)] shadow-sm hover:scale-110 transition-transform">
-          <svg className="w-5 h-5" fill={isLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+        <button 
+          onClick={handleLike}
+          className="absolute top-4 right-4 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-[var(--primary)] shadow-sm hover:scale-110 transition-transform"
+          aria-label="Like post"
+        >
+          <svg className="w-5 h-5" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </button>
@@ -38,11 +69,10 @@ export default function CommunityCard({ image, tags = [], title, authorName, aut
           </div>
           <div className="flex flex-col">
             <span className="text-xs font-bold text-[var(--text-main)]">{authorName}</span>
-            <span className="text-[10px] text-gray-500 font-medium">{likes} likes</span>
+            <span className="text-[10px] text-gray-500 font-medium">{likeCount} likes</span>
           </div>
         </div>
       </div>
     </div>
   );
 }
-

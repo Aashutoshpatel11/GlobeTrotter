@@ -1,5 +1,5 @@
-const MOCK_DELAY = 500;
-const USE_MOCK = import.meta.env.VITE_USE_MOCK_API === 'true';
+const MOCK_DELAY = 300;
+const USE_MOCK = import.meta.env.VITE_USE_MOCK_API !== 'false';
 
 const mockPosts = [
   {

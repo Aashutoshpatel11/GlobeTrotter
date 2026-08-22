@@ -1,7 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../common/Button';
 
 export default function TripSummary() {
+  const navigate = useNavigate();
+  const [isSaved, setIsSaved] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
+
+  const handleSave = () => {
+    setIsSaved(true);
+    setTimeout(() => setIsSaved(false), 3000);
+  };
+
   return (
     <div className="bg-white rounded-3xl p-6 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] border border-gray-100 mb-6">
       <div className="flex items-center justify-between mb-6">
@@ -11,8 +21,11 @@ export default function TripSummary() {
           </svg>
           <h3 className="font-bold text-[var(--text-main)]">Trip Summary</h3>
         </div>
-        <button className="px-3 py-1 rounded-full border border-gray-200 text-xs font-bold text-gray-500 hover:bg-gray-50">
-          View Details
+        <button 
+          onClick={() => navigate('/budget')} 
+          className="px-3 py-1 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:text-[var(--primary)] hover:border-[var(--primary)] transition-colors"
+        >
+          View Budget Breakdown →
         </button>
       </div>
 
@@ -52,9 +65,21 @@ export default function TripSummary() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Button fullWidth className="text-sm shadow-sm py-3">Save Itinerary</Button>
-        <button className="w-12 h-12 shrink-0 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-100 transition-colors">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <Button 
+          onClick={handleSave} 
+          fullWidth 
+          className={`text-sm shadow-sm py-3 transition-all ${isSaved ? 'bg-[#2c7a40] hover:bg-[#236334]' : ''}`}
+        >
+          {isSaved ? '✓ Itinerary Saved!' : 'Save Itinerary'}
+        </Button>
+        <button 
+          onClick={() => setIsFavorited(!isFavorited)}
+          className={`w-12 h-12 shrink-0 rounded-full border flex items-center justify-center transition-colors shadow-sm ${
+            isFavorited ? 'border-red-200 bg-red-50 text-red-500' : 'border-gray-200 text-gray-400 hover:text-red-500'
+          }`}
+          aria-label="Bookmark trip"
+        >
+          <svg className="w-5 h-5" fill={isFavorited ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </button>
@@ -62,4 +87,3 @@ export default function TripSummary() {
     </div>
   );
 }
-
