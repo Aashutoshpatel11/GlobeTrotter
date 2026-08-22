@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { getUpcomingTrips } from '../services/trips.api.js';
+
 import { Link } from 'react-router-dom';
 import Navbar from '../components/common/Navbar';
 import SearchFilters from '../components/search/SearchFilters';
@@ -6,24 +8,19 @@ import TripCard from '../components/trip/TripCard';
 import Button from '../components/common/Button';
 
 export default function Dashboard() {
-  const upcomingTrips = [
-    {
-      id: 1,
-      title: 'Amalfi Coast',
-      image: 'https://images.unsplash.com/photo-1533682805518-48d1f5b8cb3a?auto=format&fit=crop&q=80&w=400',
-      badgeText: 'In 12 days',
-      badgeColor: 'green',
-      dates: 'Sep 14 - Sep 21',
-    },
-    {
-      id: 2,
-      title: 'Kyoto Autumn',
-      image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=400',
-      badgeText: 'Nov 3',
-      badgeColor: 'blue',
-      dates: 'Nov 03 - Nov 15',
-    }
-  ];
+  const [upcomingTrips, setUpcomingTrips] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    getUpcomingTrips().then(res => {
+      setUpcomingTrips(res.data);
+      setIsLoading(false);
+    }).catch(err => {
+      setError("Failed to load trips. Please try again.");
+      setIsLoading(false);
+    });
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#fdfbf7]">
@@ -60,8 +57,17 @@ export default function Dashboard() {
           </div>
           
           {/* Horizontal scroll container */}
+          {error && <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-sm">{error}</div>}
+          
           <div className="flex gap-6 overflow-x-auto pb-6 hide-scrollbar -mx-6 px-6 md:mx-0 md:px-0">
-            {upcomingTrips.map((trip) => (
+            {isLoading ? (
+               [1,2,3].map(i => (
+                 <div key={i} className="min-w-[280px] w-[280px] h-[240px] bg-gray-200 animate-pulse rounded-2xl"></div>
+               ))
+            ) : upcomingTrips.length === 0 ? (
+               <div className="w-full py-12 text-center text-gray-500">No trips found. <Link to="/create-trip" className="text-[var(--primary)] hover:underline">Start a new one!</Link></div>
+            ) : (
+               upcomingTrips.map((trip) => (
               <TripCard 
                 key={trip.id}
                 title={trip.title}

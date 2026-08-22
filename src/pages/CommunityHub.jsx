@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getCommunityPosts } from '../services/community.api.js';
+
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import CommunityCard from '../components/community/CommunityCard';

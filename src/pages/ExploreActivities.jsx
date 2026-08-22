@@ -1,57 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getActivities } from '../services/discovery.api.js';
+
 import Navbar from '../components/common/Navbar';
 
 export default function ExploreActivities() {
-  const [activities, setActivities] = useState([
-    {
-      id: 1,
-      image: 'https://images.unsplash.com/photo-1542931287-023b922fa89b?auto=format&fit=crop&q=80&w=600',
-      category: 'Food & Drink',
-      tagColor: 'text-blue-300',
-      title: 'Street Food & Night Market Tour',
-      rating: 4.8,
-      duration: '3 hrs',
-      cost: '$45',
-      desc: 'Taste authentic local dishes and explore vibrant night markets with an expert guide.',
-      added: true
-    },
-    {
-      id: 2,
-      image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&q=80&w=600',
-      category: 'Adventure',
-      tagColor: 'text-green-300',
-      title: 'Sunrise Peak Guided Hike',
-      rating: 4.9,
-      duration: '5 hrs',
-      cost: '$60',
-      desc: 'Experience breathtaking views from the summit with our experienced local mountaineers.',
-      added: false
-    },
-    {
-      id: 3,
-      image: 'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?auto=format&fit=crop&q=80&w=600',
-      category: 'Culture',
-      tagColor: 'text-orange-300',
-      title: 'National Museum Fast-Track',
-      rating: 4.6,
-      duration: '2.5 hrs',
-      cost: '$30',
-      desc: 'Skip the lines and dive into history with an audio guide covering centuries of art.',
-      added: false
-    },
-    {
-      id: 4,
-      image: 'https://images.unsplash.com/photo-1513519107127-1bed33748e4c?auto=format&fit=crop&q=80&w=600',
-      category: 'Relaxation',
-      tagColor: 'text-blue-300',
-      title: 'Thermal Baths & Massage',
-      rating: 4.9,
-      duration: '4 hrs',
-      cost: '$120',
-      desc: 'Unwind in historic thermal pools followed by a signature deep tissue massage.',
-      added: false
-    }
-  ]);
+  const [activities, setActivities] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    getActivities().then(res => {
+      setActivities(res.data);
+      setIsLoading(false);
+    }).catch(err => {
+      setError("Failed to load activities.");
+      setIsLoading(false);
+    });
+  }, []);
 
   const toggleAdd = (id) => {
     setActivities(acts => acts.map(act => act.id === id ? { ...act, added: !act.added } : act));
@@ -127,8 +92,23 @@ export default function ExploreActivities() {
         </div>
 
         {/* Results Grid */}
+        {error && <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-sm">{error}</div>}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {activities.map((act) => (
+          {isLoading ? (
+             [1,2,3,4,5,6].map(i => (
+               <div key={i} className="bg-white rounded-3xl h-[400px] border border-gray-100 flex flex-col group overflow-hidden">
+                 <div className="h-[200px] bg-gray-200 animate-pulse"></div>
+                 <div className="p-5 flex-1 space-y-3">
+                   <div className="h-6 bg-gray-200 animate-pulse rounded w-3/4"></div>
+                   <div className="h-4 bg-gray-200 animate-pulse rounded w-1/2"></div>
+                   <div className="h-20 bg-gray-200 animate-pulse rounded w-full"></div>
+                 </div>
+               </div>
+             ))
+          ) : activities.length === 0 ? (
+             <div className="col-span-full py-12 text-center text-gray-500">No activities found matching your criteria.</div>
+          ) : (
+             activities.map((act) => (
             <div key={act.id} className="bg-white rounded-3xl overflow-hidden shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col group hover:shadow-md transition-all">
               <div className="relative h-[200px] w-full bg-gray-200">
                 <img src={act.image} alt={act.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
